@@ -32,6 +32,7 @@
 
 package org.opensearch.tools.launchers;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -297,7 +298,7 @@ final class JvmOptionsParser {
     ) throws IOException {
         int lineNumber = 0;
         while (true) {
-            final String line = br.readLine();
+            final String line = BoundedLineReader.readLine(br, 5_000_000);
             lineNumber++;
             if (line == null) {
                 break;
