@@ -32,6 +32,8 @@
 
 package org.opensearch.plugins;
 
+import io.github.pixee.security.HostValidator;
+import io.github.pixee.security.Urls;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import org.apache.lucene.search.spell.LevenshteinDistance;
@@ -417,7 +419,7 @@ class InstallPluginCommand extends EnvironmentAwareCommand {
     @SuppressForbidden(reason = "Make HEAD request using URLConnection.connect()")
     boolean urlExists(Terminal terminal, String urlString) throws IOException {
         terminal.println(VERBOSE, "Checking if url exists: " + urlString);
-        URL url = new URL(urlString);
+        URL url = Urls.create(urlString, Urls.HTTP_PROTOCOLS, HostValidator.DENY_COMMON_INFRASTRUCTURE_TARGETS);
         assert "https".equals(url.getProtocol()) : "Use of https protocol is required";
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.addRequestProperty("User-Agent", "opensearch-plugin-installer");
@@ -445,7 +447,7 @@ class InstallPluginCommand extends EnvironmentAwareCommand {
     @SuppressForbidden(reason = "We use getInputStream to download plugins")
     Path downloadZip(Terminal terminal, String urlString, Path tmpDir, boolean isBatch) throws IOException {
         terminal.println(VERBOSE, "Retrieving zip from " + urlString);
-        URL url = new URL(urlString);
+        URL url = Urls.create(urlString, Urls.HTTP_PROTOCOLS, HostValidator.DENY_COMMON_INFRASTRUCTURE_TARGETS);
         Path zip = Files.createTempFile(tmpDir, null, ".zip");
         URLConnection urlConnection = url.openConnection();
         urlConnection.addRequestProperty("User-Agent", "opensearch-plugin-installer");
@@ -702,7 +704,7 @@ class InstallPluginCommand extends EnvironmentAwareCommand {
      */
     // pkg private for tests
     URL openUrl(String urlString) throws IOException {
-        URL checksumUrl = new URL(urlString);
+        URL checksumUrl = Urls.create(urlString, Urls.HTTP_PROTOCOLS, HostValidator.DENY_COMMON_INFRASTRUCTURE_TARGETS);
         HttpURLConnection connection = (HttpURLConnection) checksumUrl.openConnection();
         if (connection.getResponseCode() == 404) {
             return null;

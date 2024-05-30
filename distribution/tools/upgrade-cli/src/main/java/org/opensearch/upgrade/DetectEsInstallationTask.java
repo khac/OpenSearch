@@ -9,6 +9,8 @@
 package org.opensearch.upgrade;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.pixee.security.HostValidator;
+import io.github.pixee.security.Urls;
 import org.opensearch.Version;
 import org.opensearch.cli.Terminal;
 import org.opensearch.common.SuppressForbidden;
@@ -124,7 +126,7 @@ class DetectEsInstallationTask implements UpgradeTask {
     @SuppressForbidden(reason = "Need to connect to http endpoint for elasticsearch.")
     private boolean isRunning(final String url) {
         try {
-            final URL esUrl = new URL(url);
+            final URL esUrl = Urls.create(url, Urls.HTTP_PROTOCOLS, HostValidator.DENY_COMMON_INFRASTRUCTURE_TARGETS);
             final HttpURLConnection conn = (HttpURLConnection) esUrl.openConnection();
             conn.setRequestMethod("GET");
             conn.setConnectTimeout(1000);
@@ -138,7 +140,7 @@ class DetectEsInstallationTask implements UpgradeTask {
     @SuppressForbidden(reason = "Retrieve information on the installation.")
     private Map<?, ?> fetchInfoFromUrl(final String url) {
         try {
-            final URL esUrl = new URL(url);
+            final URL esUrl = Urls.create(url, Urls.HTTP_PROTOCOLS, HostValidator.DENY_COMMON_INFRASTRUCTURE_TARGETS);
             final HttpURLConnection conn = (HttpURLConnection) esUrl.openConnection();
             conn.setRequestMethod("GET");
             conn.setConnectTimeout(1000);
@@ -171,7 +173,7 @@ class DetectEsInstallationTask implements UpgradeTask {
     private List<String> fetchPluginsFromUrl(final String url) {
         final List<String> plugins = new ArrayList<>();
         try {
-            final URL esUrl = new URL(url + "/_cat/plugins?format=json&local=true");
+            final URL esUrl = Urls.create(url + "/_cat/plugins?format=json&local=true", Urls.HTTP_PROTOCOLS, HostValidator.DENY_COMMON_INFRASTRUCTURE_TARGETS);
             final HttpURLConnection conn = (HttpURLConnection) esUrl.openConnection();
             conn.setRequestMethod("GET");
             conn.setConnectTimeout(1000);
