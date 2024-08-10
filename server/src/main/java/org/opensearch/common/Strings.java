@@ -32,6 +32,7 @@
 
 package org.opensearch.common;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.lucene.util.BytesRefBuilder;
 import org.opensearch.OpenSearchException;
 import org.opensearch.ExceptionsHelper;
@@ -71,7 +72,7 @@ public class Strings {
     public static void spaceify(int spaces, String from, StringBuilder to) throws Exception {
         try (BufferedReader reader = new BufferedReader(new StringReader(from))) {
             String line;
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 for (int i = 0; i < spaces; i++) {
                     to.append(' ');
                 }

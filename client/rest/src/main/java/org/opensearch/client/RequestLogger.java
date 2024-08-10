@@ -32,6 +32,7 @@
 
 package org.opensearch.client;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
@@ -177,7 +178,7 @@ final class RequestLogger {
             }
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), charset))) {
                 String line;
-                while ((line = reader.readLine()) != null) {
+                while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                     responseLine.append("\n# ").append(line);
                 }
             }

@@ -8,6 +8,7 @@
 
 package org.opensearch.upgrade;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.opensearch.cli.Terminal;
 import org.opensearch.common.collect.Tuple;
 
@@ -37,10 +38,10 @@ class InstallPluginsTask implements UpgradeTask {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
         ) {
             Set<String> plugins = new HashSet<>();
-            String line = reader.readLine();
+            String line = BoundedLineReader.readLine(reader, 5_000_000);
             while (line != null) {
                 plugins.add(line.trim());
-                line = reader.readLine();
+                line = BoundedLineReader.readLine(reader, 5_000_000);
             }
             OFFICIAL_PLUGINS = Collections.unmodifiableSet(plugins);
         } catch (IOException e) {

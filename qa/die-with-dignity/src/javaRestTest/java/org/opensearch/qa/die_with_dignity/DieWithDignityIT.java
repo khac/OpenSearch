@@ -32,6 +32,7 @@
 
 package org.opensearch.qa.die_with_dignity;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.opensearch.client.Request;
 import org.opensearch.common.io.PathUtils;
 import org.opensearch.common.settings.Settings;
@@ -60,7 +61,7 @@ public class DieWithDignityIT extends OpenSearchRestTestCase {
 
             try (InputStream is = process.getInputStream(); BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
                 String line;
-                while ((line = in.readLine()) != null) {
+                while ((line = BoundedLineReader.readLine(in, 5_000_000)) != null) {
                     assertThat(line, line, not(containsString("-Ddie.with.dignity.test")));
                 }
             }

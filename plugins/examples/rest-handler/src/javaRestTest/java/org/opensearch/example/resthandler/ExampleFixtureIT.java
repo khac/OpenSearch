@@ -32,6 +32,7 @@
 
 package org.opensearch.example.resthandler;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.opensearch.test.OpenSearchTestCase;
 
 import java.io.BufferedReader;
@@ -66,7 +67,7 @@ public class ExampleFixtureIT extends OpenSearchTestCase {
 
             final List<String> lines = new ArrayList<>();
             String line;
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 lines.add(line);
             }
             assertThat(lines, hasItems("HTTP/1.1 200 OK", "TEST"));

@@ -32,6 +32,7 @@
 
 package org.opensearch.common.io;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.io.stream.BytesStream;
 import org.opensearch.common.io.stream.BytesStreamOutput;
@@ -210,7 +211,7 @@ public abstract class Streams {
     public static void readAllLines(InputStream input, Consumer<String> consumer) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
             String line;
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 consumer.accept(line);
             }
         }
