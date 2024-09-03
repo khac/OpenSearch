@@ -32,6 +32,8 @@
 
 package org.opensearch.gradle.http;
 
+import io.github.pixee.security.HostValidator;
+import io.github.pixee.security.Urls;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -79,7 +81,7 @@ public class WaitForHttpResource {
     private String password;
 
     public WaitForHttpResource(String protocol, String host, int numberOfNodes) throws MalformedURLException {
-        this(new URL(protocol + "://" + host + "/_cluster/health?wait_for_nodes=>=" + numberOfNodes + "&wait_for_status=yellow"));
+        this(Urls.create(protocol + "://" + host + "/_cluster/health?wait_for_nodes=>=" + numberOfNodes + "&wait_for_status=yellow", Urls.HTTP_PROTOCOLS, HostValidator.DENY_COMMON_INFRASTRUCTURE_TARGETS));
     }
 
     public WaitForHttpResource(URL url) {

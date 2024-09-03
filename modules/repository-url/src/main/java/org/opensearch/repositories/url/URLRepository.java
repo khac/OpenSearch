@@ -32,6 +32,8 @@
 
 package org.opensearch.repositories.url;
 
+import io.github.pixee.security.HostValidator;
+import io.github.pixee.security.Urls;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.metadata.RepositoryMetadata;
@@ -194,7 +196,7 @@ public class URLRepository extends BlobStoreRepository {
 
     private static URL parseURL(String s) {
         try {
-            return new URL(s);
+            return Urls.create(s, Urls.HTTP_PROTOCOLS, HostValidator.DENY_COMMON_INFRASTRUCTURE_TARGETS);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Unable to parse URL repository setting", e);
         }

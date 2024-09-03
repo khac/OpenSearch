@@ -32,6 +32,8 @@
 
 package org.opensearch.painless;
 
+import io.github.pixee.security.HostValidator;
+import io.github.pixee.security.Urls;
 import org.opensearch.bootstrap.BootstrapInfo;
 import org.opensearch.painless.antlr.Walker;
 import org.opensearch.painless.ir.ClassNode;
@@ -79,7 +81,7 @@ final class Compiler {
     static {
         try {
             // Setup the code privileges.
-            CODESOURCE = new CodeSource(new URL("file:" + BootstrapInfo.UNTRUSTED_CODEBASE), (Certificate[]) null);
+            CODESOURCE = new CodeSource(Urls.create("file:" + BootstrapInfo.UNTRUSTED_CODEBASE, Urls.HTTP_PROTOCOLS, HostValidator.DENY_COMMON_INFRASTRUCTURE_TARGETS), (Certificate[]) null);
         } catch (MalformedURLException impossible) {
             throw new RuntimeException(impossible);
         }
