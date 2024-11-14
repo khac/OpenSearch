@@ -32,6 +32,7 @@
 
 package org.opensearch.ingest.useragent;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.opensearch.OpenSearchParseException;
 import org.opensearch.common.Strings;
 import org.opensearch.test.OpenSearchTestCase;
@@ -81,7 +82,7 @@ public class UserAgentProcessorFactoryTests extends OpenSearchTestCase {
             BufferedWriter writer = Files.newBufferedWriter(userAgentConfigDir.resolve(regexWithoutDevicesFilename));
         ) {
             String line;
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 if (line.startsWith("device_parsers:")) {
                     break;
                 }

@@ -32,6 +32,7 @@
 
 package org.opensearch.index.analysis;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.CharArraySet;
@@ -299,7 +300,7 @@ public class Analysis {
         final List<String> result = new ArrayList<>();
         try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String word;
-            while ((word = br.readLine()) != null) {
+            while ((word = BoundedLineReader.readLine(br, 5_000_000)) != null) {
                 if (Strings.hasText(word) == false) {
                     continue;
                 }

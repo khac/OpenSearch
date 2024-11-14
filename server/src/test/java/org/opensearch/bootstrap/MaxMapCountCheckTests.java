@@ -32,6 +32,7 @@
 
 package org.opensearch.bootstrap;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -138,7 +139,7 @@ public class MaxMapCountCheckTests extends AbstractBootstrapCheckTestCase {
     public void testGetMaxMapCount() throws IOException, IllegalAccessException {
         final long procSysVmMaxMapCount = randomIntBetween(1, Integer.MAX_VALUE);
         final BufferedReader reader = mock(BufferedReader.class);
-        when(reader.readLine()).thenReturn(Long.toString(procSysVmMaxMapCount));
+        when(BoundedLineReader.readLine(reader, 5_000_000)).thenReturn(Long.toString(procSysVmMaxMapCount));
         final Path procSysVmMaxMapCountPath = PathUtils.get("/proc/sys/vm/max_map_count");
         BootstrapChecks.MaxMapCountCheck check = new BootstrapChecks.MaxMapCountCheck() {
             @Override
@@ -154,7 +155,7 @@ public class MaxMapCountCheckTests extends AbstractBootstrapCheckTestCase {
         {
             reset(reader);
             final IOException ioException = new IOException("fatal");
-            when(reader.readLine()).thenThrow(ioException);
+            when(BoundedLineReader.readLine(reader, 5_000_000)).thenThrow(ioException);
             final Logger logger = LogManager.getLogger("testGetMaxMapCountIOException");
             try (MockLogAppender appender = MockLogAppender.createForLoggers(logger)) {
                 appender.addExpectation(
@@ -175,7 +176,7 @@ public class MaxMapCountCheckTests extends AbstractBootstrapCheckTestCase {
 
         {
             reset(reader);
-            when(reader.readLine()).thenReturn("eof");
+            when(BoundedLineReader.readLine(reader, 5_000_000)).thenReturn("eof");
             final Logger logger = LogManager.getLogger("testGetMaxMapCountNumberFormatException");
             try (MockLogAppender appender = MockLogAppender.createForLoggers(logger)) {
                 appender.addExpectation(
@@ -245,7 +246,7 @@ public class MaxMapCountCheckTests extends AbstractBootstrapCheckTestCase {
     public void testMaxMapCountCheckRead() throws IOException {
         final String rawProcSysVmMaxMapCount = Long.toString(randomIntBetween(1, Integer.MAX_VALUE));
         final BufferedReader reader = mock(BufferedReader.class);
-        when(reader.readLine()).thenReturn(rawProcSysVmMaxMapCount);
+        when(BoundedLineReader.readLine(reader, 5_000_000)).thenReturn(rawProcSysVmMaxMapCount);
         final BootstrapChecks.MaxMapCountCheck check = new BootstrapChecks.MaxMapCountCheck();
         assertThat(check.readProcSysVmMaxMapCount(reader), equalTo(rawProcSysVmMaxMapCount));
     }

@@ -32,6 +32,7 @@
 
 package org.opensearch.gradle.util;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.opensearch.gradle.info.GlobalBuildInfoPlugin;
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
@@ -78,7 +79,7 @@ public class Util {
             BufferedReader reader = new BufferedReader(new InputStreamReader(GlobalBuildInfoPlugin.class.getResourceAsStream(resourcePath)))
         ) {
             StringBuilder b = new StringBuilder();
-            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+            for (String line = BoundedLineReader.readLine(reader, 5_000_000); line != null; line = BoundedLineReader.readLine(reader, 5_000_000)) {
                 if (b.length() != 0) {
                     b.append('\n');
                 }

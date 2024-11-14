@@ -32,6 +32,7 @@
 
 package org.opensearch.plugins;
 
+import io.github.pixee.security.BoundedLineReader;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import org.apache.lucene.search.spell.LevenshteinDistance;
@@ -152,10 +153,10 @@ class InstallPluginCommand extends EnvironmentAwareCommand {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
         ) {
             Set<String> modules = new HashSet<>();
-            String line = reader.readLine();
+            String line = BoundedLineReader.readLine(reader, 5_000_000);
             while (line != null) {
                 modules.add(line.trim());
-                line = reader.readLine();
+                line = BoundedLineReader.readLine(reader, 5_000_000);
             }
             MODULES = Collections.unmodifiableSet(modules);
         } catch (IOException e) {
@@ -171,10 +172,10 @@ class InstallPluginCommand extends EnvironmentAwareCommand {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
         ) {
             Set<String> plugins = new TreeSet<>(); // use tree set to get sorting for help command
-            String line = reader.readLine();
+            String line = BoundedLineReader.readLine(reader, 5_000_000);
             while (line != null) {
                 plugins.add(line.trim());
-                line = reader.readLine();
+                line = BoundedLineReader.readLine(reader, 5_000_000);
             }
             OFFICIAL_PLUGINS = Collections.unmodifiableSet(plugins);
         } catch (IOException e) {
@@ -557,13 +558,13 @@ class InstallPluginCommand extends EnvironmentAwareCommand {
              */
             if (digestAlgo.equals("SHA-1")) {
                 final BufferedReader checksumReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-                expectedChecksum = checksumReader.readLine();
-                if (checksumReader.readLine() != null) {
+                expectedChecksum = BoundedLineReader.readLine(checksumReader, 5_000_000);
+                if (BoundedLineReader.readLine(checksumReader, 5_000_000) != null) {
                     throw new UserException(ExitCodes.IO_ERROR, "Invalid checksum file at " + checksumUrl);
                 }
             } else {
                 final BufferedReader checksumReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-                final String checksumLine = checksumReader.readLine();
+                final String checksumLine = BoundedLineReader.readLine(checksumReader, 5_000_000);
                 final String[] fields = checksumLine.split(" {2}");
                 if (officialPlugin && fields.length != 2 || officialPlugin == false && fields.length > 2) {
                     throw new UserException(ExitCodes.IO_ERROR, "Invalid checksum file at " + checksumUrl);
@@ -584,7 +585,7 @@ class InstallPluginCommand extends EnvironmentAwareCommand {
                         throw new UserException(ExitCodes.IO_ERROR, message);
                     }
                 }
-                if (checksumReader.readLine() != null) {
+                if (BoundedLineReader.readLine(checksumReader, 5_000_000) != null) {
                     throw new UserException(ExitCodes.IO_ERROR, "Invalid checksum file at " + checksumUrl);
                 }
             }

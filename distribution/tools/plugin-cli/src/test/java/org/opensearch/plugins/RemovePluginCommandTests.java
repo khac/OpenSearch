@@ -32,6 +32,7 @@
 
 package org.opensearch.plugins;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.lucene.tests.util.LuceneTestCase;
 import org.opensearch.Version;
 import org.opensearch.cli.ExitCodes;
@@ -274,14 +275,14 @@ public class RemovePluginCommandTests extends OpenSearchTestCase {
             BufferedReader reader = new BufferedReader(new StringReader(terminal.getOutput()));
             BufferedReader errorReader = new BufferedReader(new StringReader(terminal.getErrorOutput()))
         ) {
-            assertEquals("searching in other folders to find if plugin exists with custom folder name", reader.readLine());
-            assertEquals("-> removing [fake]...", reader.readLine());
+            assertEquals("searching in other folders to find if plugin exists with custom folder name", BoundedLineReader.readLine(reader, 5_000_000));
+            assertEquals("-> removing [fake]...", BoundedLineReader.readLine(reader, 5_000_000));
             assertEquals(
                 "ERROR: plugin [fake] not found; run 'opensearch-plugin list' to get list of installed plugins",
-                errorReader.readLine()
+                BoundedLineReader.readLine(errorReader, 5_000_000)
             );
-            assertNull(reader.readLine());
-            assertNull(errorReader.readLine());
+            assertNull(BoundedLineReader.readLine(reader, 5_000_000));
+            assertNull(BoundedLineReader.readLine(errorReader, 5_000_000));
         }
     }
 

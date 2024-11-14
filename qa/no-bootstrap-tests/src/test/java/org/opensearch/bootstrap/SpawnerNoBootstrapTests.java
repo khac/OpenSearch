@@ -32,6 +32,7 @@
 
 package org.opensearch.bootstrap;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.lucene.util.Constants;
 import org.apache.lucene.tests.util.LuceneTestCase;
 import org.opensearch.Version;
@@ -172,7 +173,7 @@ public class SpawnerNoBootstrapTests extends LuceneTestCase {
             Process process = processes.get(0);
             final InputStreamReader in = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8);
             try (BufferedReader stdoutReader = new BufferedReader(in)) {
-                String line = stdoutReader.readLine();
+                String line = BoundedLineReader.readLine(stdoutReader, 5_000_000);
                 assertEquals("I am alive", line);
                 spawner.close();
                 // fail if the process does not die within one second; usually it will be even quicker but it depends on OS scheduling

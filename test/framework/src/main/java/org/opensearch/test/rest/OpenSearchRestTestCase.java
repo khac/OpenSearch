@@ -32,6 +32,7 @@
 
 package org.opensearch.test.rest;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
@@ -432,7 +433,7 @@ public abstract class OpenSearchRestTestCase extends OpenSearchTestCase {
                         int activeTasks = 0;
                         String line;
                         final StringBuilder tasksListString = new StringBuilder();
-                        while ((line = responseReader.readLine()) != null) {
+                        while ((line = BoundedLineReader.readLine(responseReader, 5_000_000)) != null) {
                             final String taskName = line.split("\\s+")[0];
                             if (taskName.startsWith(ListTasksAction.NAME) || taskFilter.test(taskName)) {
                                 continue;
